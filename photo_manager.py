@@ -17,19 +17,21 @@ def analysis_folder():
 	folder_list =[]
 	file_list = []
 	for file_name_list in file_name_lists:
-		if file_name_list.find(".")==-1:
-			folder_list.append(file_name_list)
-		else:
+		if file_name_list.find(".")!=-1 and file_name_list.find(".")!=0 and file_name_list.find(os.path.basename(__file__))==-1:
 			file_list.append(file_name_list)
+		else:
+			folder_list.append(file_name_list)
 	return folder_list,file_list
 # %%
 import time
 import shutil
 def loop_command():
-	current_time,current_folder = get_time()
-	folder_list,file_list = analysis_folder()
-	for file_name in file_list:
-		shutil.move(f"{file_name}", f"{current_folder}/{file_name}")
+	while True:
+		current_time,current_folder = get_time()
+		folder_list,file_list = analysis_folder()
+		for file_name in file_list:
+			shutil.move(f"{file_name}", f"{current_folder}/{file_name}")
+		time.sleep(5)
 loop_command()
 
 
