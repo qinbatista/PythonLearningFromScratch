@@ -234,4 +234,48 @@ def gradient_descent(f , init_x, lr = 0.01, step_num =100):
 init_x = np.array([-3.0, 4.0])
 gradient_descent(function_2, init_x = init_x, lr=0.1, step_num=100)
 
+# %%神经网络梯度
+class simpleNet:
+	def __init__(self):
+		self.W = np.random.randn(2,3)
+	def predict(self,x):
+		return np.dot(x , self.W)
+	def loss(self, x,t):
+		z = self.predict(x)
+		y = softmax(z)
+		loss = cross_entropy_error(y,t)
+		return loss
+net = simpleNet()
+print(net.W)
+# %%输出当前点的预测概率
+x = np.array([0.6,0.9])
+p = net.predict(x)
+print(p)
+print(np.argmax(p))
+
+# %%
+t = np.array([0,0,1])
+net.loss(x,t)
+
+# %%
+
+def numerical_gradient(f, x):
+	h = 1e-4 # 0.0001
+	grad = np.zeros_like(x)
+	it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
+	while not it.finished:
+		idx = it.multi_index
+		tmp_val = x[idx]
+		x[idx] = float(tmp_val) + h
+		fxh1 = f(x) # f(x+h)
+		x[idx] = tmp_val - h
+		fxh2 = f(x) # f(x-h)
+		grad[idx] = (fxh1 - fxh2) / (2*h)
+		x[idx] = tmp_val # 还原值
+		it.iternext()
+	return grad
+f = lambda w: net.loss(x, t)
+dw = numerical_gradient(f, net.W)
+print(dw)
+
 # %%
