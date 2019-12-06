@@ -149,6 +149,12 @@ for i in range(0, len(x), batch_size):
 print("Accuracy:"+str(float(accuracy_cnt)/len(x)))
 
 
+
+
+'''
+第四章
+'''
+
 # %%均方误差
 def mean_squared_error(y, t):
 	return 0.5 * np.sum((y-t)**2)
@@ -165,16 +171,12 @@ mean_squared_error(np.array(y2),np.array(t))
 def cross_entropy_error(y,t):
 	delta = 1e-7
 	return -np.sum(t*np.log(y + delta))
-
 cross_entropy_error(np.array(y1), np.array(t))
-#%%
 cross_entropy_error(np.array(y2), np.array(t))
 
-# %%
+# %%mini patch
 print(x_train.shape)
 print(t_train.shape)
-
-# %%
 train_size = x_train.shape[0]
 batch_size = 10
 batch_mask = np.random.choice(train_size, batch_size)
@@ -253,11 +255,11 @@ p = net.predict(x)
 print(p)
 print(np.argmax(p))
 
-# %%
+# %%s损失函数
 t = np.array([0,0,1])
 net.loss(x,t)
 
-# %%
+# %%求梯度
 def numerical_gradient(f, x):
 	h = 1e-4 # 0.0001
 	grad = np.zeros_like(x)
@@ -314,3 +316,26 @@ class TwoLayerNet:
 		grads['W2'] = numerical_gradient(loss_W , self.params['W2'])
 		grads['b2'] = numerical_gradient(loss_W , self.params['b2'])
 		return grads
+#%%mini-batch的实现
+import numpy as np
+from source_code.dataset.mnist import load_mnist
+(x_train, t_train), (x_test, t_test) = load_mnist(normalize=True, one_hot_label= True)
+train_loss_list = []
+iters_num = 10000
+train_size = x_train.shape[0]
+batch_size = 100
+learning_rate = 0.1
+network = TwoLayerNet(input_size= 784, hidden_size=50, outout_size=10)
+for i in range(iters_num):
+	batch_mask = np.random.choice(train_size, batch_size)
+	x_batch = x_train[batch_mask]
+	t_batch = t_train[batch_mask]
+	#计算梯度
+	grad = network.numerical_gradient(x_batch,t_batch)
+	for key in ('W1','b1','W2','b2'):
+		network.params[key]-= learning_rate*grad[key]
+	#记录学习过程
+	loss = network.loss(x_batch,t_batch)
+	train_loss_list.append(loss)
+
+# %%
